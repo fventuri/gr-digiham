@@ -1,0 +1,72 @@
+id: digiham_rrc_filter
+label: RRC Filter
+category: '[digiham]'
+flags: '[ python, cpp ]'
+
+parameters:
+-   id: n_zeros
+    label: nZeros
+    dtype: int
+    default: 0
+    hide: ${'all' if type != 'General' else 'none'}
+-   id: gain
+    label: Gain
+    dtype: float
+    default: 0.0
+    hide: ${'all' if type != 'General' else 'none'}
+-   id: coeffs
+    label: Coeffs
+    dtype: float_vector
+    hide: ${'all' if type != 'General' else 'none'}
+-   id: type
+    label: RRC Filter Type
+    dtype: enum
+    default: 'Wide'
+    options: ['General', 'Narrow', 'Wide']
+    option_labels: ['General', 'Narrow', 'Wide']
+
+inputs:
+-   domain: stream
+    dtype: float
+
+outputs:
+-   domain: stream
+    dtype: float
+
+templates:
+    imports: from gnuradio import digiham
+    make: |-
+        % if str(type) == 'General':
+        digiham.rrc_filter(${n_zeros}, ${gain}, ${coeffs})
+        % else:
+        digiham.rrc_filter(digiham.rrc_filter.${type})
+        % endif
+
+cpp_templates:
+    includes: [ '#include <gnuradio/digiham/rrc_filter.h>' ]
+    declarations: 'digiham::rrc_filter::sptr ${id};'
+    make: |-
+        % if str(type) == 'General':
+        'this->${id} = digiham::rrc_filter::make(${n_zeros}, ${gain}, ${coeffs});'
+        % else:
+        'this->${id} = digiham::rrc_filter::make(rrc_filter::RrcFilterType::${type});'
+        % endif
+    translations:
+        "'": '"'
+        'True': 'true'
+        'False': 'false'
+
+documentation: |-
+    Digiham RRC Filter:
+
+    nZeros:
+
+    Gain:
+
+    Coeffs:
+
+    RRC Filter Type:
+    One of: General, Narrow, Wide
+
+
+file_format: 1

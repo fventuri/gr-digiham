@@ -1,0 +1,48 @@
+id: digiham_fsk_demodulator
+label: FSK Demodulator
+category: '[digiham]'
+flags: '[ python, cpp ]'
+
+parameters:
+-   id: samples_per_symbol
+    label: Samples per Symbol
+    dtype: int
+    default: 10
+-   id: invert
+    label: Invert output bits
+    dtype: enum
+    default: 'False'
+    options: ['True', 'False']
+    option_labels: ['Yes', 'No']
+
+inputs:
+-   domain: stream
+    dtype: float
+
+outputs:
+-   domain: stream
+    dtype: byte
+
+templates:
+    imports: from gnuradio import digiham
+    make: digiham.fsk_demodulator(${samples_per_symbol}, ${invert})
+
+cpp_templates:
+    includes: [ '#include <gnuradio/digiham/fsk_demodulator.h>' ]
+    declarations: 'digiham::fsk_demodulator::sptr ${id};'
+    make: 'this->${id} = digiham::fsk_demodulator::make(${samples_per_symbol}, ${invert});'
+    translations:
+        "'": '"'
+        'True': 'true'
+        'False': 'false'
+
+documentation: |-
+    Digiham FSK Demodulator:
+
+    Samples per Symbol:
+
+    Invert:
+    Inverts output bits
+
+
+file_format: 1

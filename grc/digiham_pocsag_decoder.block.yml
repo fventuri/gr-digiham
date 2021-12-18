@@ -1,0 +1,32 @@
+id: digiham_pocsag_decoder
+label: POCSAG Decoder
+category: '[digiham]'
+flags: '[ python, cpp ]'
+
+inputs:
+-   domain: stream
+    dtype: byte
+
+outputs:
+-   domain: message
+    id: metadata
+    optional: true
+
+templates:
+    imports: from gnuradio import digiham
+    make: digiham.pocsag_decoder()
+
+cpp_templates:
+    includes: [ '#include <gnuradio/digiham/pocsag_decoder.h>' ]
+    declarations: 'digiham::pocsag_decoder::sptr ${id};'
+    make: 'this->${id} = digiham::pocsag_decoder::make();'
+    translations:
+        "'": '"'
+        'True': 'true'
+        'False': 'false'
+
+documentation: |-
+    Digiham POCSAG Decoder:
+
+
+file_format: 1

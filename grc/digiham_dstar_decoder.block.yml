@@ -1,0 +1,34 @@
+id: digiham_dstar_decoder
+label: DStar Decoder
+category: '[digiham]'
+flags: '[ python, cpp ]'
+
+inputs:
+-   domain: stream
+    dtype: byte
+
+outputs:
+-   domain: stream
+    dtype: byte
+-   domain: message
+    id: metadata
+    optional: true
+
+templates:
+    imports: from gnuradio import digiham
+    make: digiham.dstar_decoder()
+
+cpp_templates:
+    includes: [ '#include <gnuradio/digiham/dstar_decoder.h>' ]
+    declarations: 'digiham::dstar_decoder::sptr ${id};'
+    make: 'this->${id} = digiham::dstar_decoder::make();' 
+    translations:
+        "'": '"'
+        'True': 'true'
+        'False': 'false'
+
+documentation: |-
+    Digiham DStar Decoder:
+
+
+file_format: 1

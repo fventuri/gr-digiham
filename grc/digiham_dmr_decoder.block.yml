@@ -1,0 +1,49 @@
+id: digiham_dmr_decoder
+label: DMR Decoder
+category: '[digiham]'
+flags: '[ python, cpp ]'
+
+parameters:
+-   id: slot_filter
+    label: TDMA Slot Filter
+    dtype: enum
+    default: '3'
+    options: ['1', '2', '3']
+    option_labels: ['First', 'Second', 'Either']
+
+inputs:
+-   domain: stream
+    dtype: byte
+
+outputs:
+-   domain: stream
+    dtype: byte
+-   domain: message
+    id: metadata
+    optional: true
+
+templates:
+    imports: from gnuradio import digiham
+    make: digiham.dmr_decoder(${slot_filter})
+    callbacks:
+    - set_slot_filter(${slot_filter})
+
+cpp_templates:
+    includes: [ '#include <gnuradio/digiham/dmr_decoder.h>' ]
+    declarations: 'digiham::dmr_decoder::sptr ${id};'
+    make: 'this->${id} = digiham::dmr_decoder::make(${slot_filter});'
+    callbacks:
+    - set_slot_filter(${slot_filter});
+    translations:
+        "'": '"'
+        'True': 'true'
+        'False': 'false'
+
+documentation: |-
+    Digiham DMR Decoder:
+
+    TDMA Slot Filter:
+    One of: First (1), Second (2), Either (3)
+
+
+file_format: 1

@@ -1,0 +1,34 @@
+id: digiham_ysf_decoder
+label: YSF Decoder
+category: '[digiham]'
+flags: '[ python, cpp ]'
+
+inputs:
+-   domain: stream
+    dtype: byte
+
+outputs:
+-   domain: stream
+    dtype: byte
+-   domain: message
+    id: metadata
+    optional: true
+
+templates:
+    imports: from gnuradio import digiham
+    make: digiham.ysf_decoder()
+
+cpp_templates:
+    includes: [ '#include <gnuradio/digiham/ysf_decoder.h>' ]
+    declarations: 'digiham::ysf_decoder::sptr ${id};'
+    make: 'this->${id} = digiham::ysf_decoder::make();'
+    translations:
+        "'": '"'
+        'True': 'true'
+        'False': 'false'
+
+documentation: |-
+    Digiham YSF Decoder:
+
+
+file_format: 1

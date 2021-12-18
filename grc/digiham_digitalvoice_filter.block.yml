@@ -1,0 +1,31 @@
+id: digiham_digitalvoice_filter
+label: Digital Voice Filter
+category: '[digiham]'
+flags: '[ python, cpp ]'
+
+inputs:
+-   domain: stream
+    dtype: short
+
+outputs:
+-   domain: stream
+    dtype: short
+
+templates:
+    imports: from gnuradio import digiham
+    make: digiham.digitalvoice_filter()
+
+cpp_templates:
+    includes: [ '#include <gnuradio/digiham/digitalvoice_filter.h>' ]
+    declarations: 'digiham::digitalvoice_filter::sptr ${id};'
+    make: 'this->${id} = digiham::digitalvoice_filter::make();'
+    translations:
+        "'": '"'
+        'True': 'true'
+        'False': 'false'
+
+documentation: |-
+    Digiham Digital Voice Filter:
+
+
+file_format: 1

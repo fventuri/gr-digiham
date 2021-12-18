@@ -1,0 +1,34 @@
+id: digiham_nxdn_decoder
+label: NXDN Decoder
+category: '[digiham]'
+flags: '[ python, cpp ]'
+
+inputs:
+-   domain: stream
+    dtype: byte
+
+outputs:
+-   domain: stream
+    dtype: byte
+-   domain: message
+    id: metadata
+    optional: true
+
+templates:
+    imports: from gnuradio import digiham
+    make: digiham.nxdn_decoder()
+
+cpp_templates:
+    includes: [ '#include <gnuradio/digiham/nxdn_decoder.h>' ]
+    declarations: 'digiham::nxdn_decoder::sptr ${id};'
+    make: 'this->${id} = digiham::nxdn_decoder::make();'
+    translations:
+        "'": '"'
+        'True': 'true'
+        'False': 'false'
+
+documentation: |-
+    Digiham NXDN Decoder:
+
+
+file_format: 1
