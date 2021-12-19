@@ -10,6 +10,7 @@
 
 #include <digiham/meta.hpp>
 #include <gnuradio/basic_block.h>
+#include <iostream>
 
 namespace gr {
 namespace digiham {
@@ -22,20 +23,27 @@ private:
 
 public:
     MessageMetaWriter(basic_block* block, const std::string& port_id):
-       _block(block),
-       _port_id(pmt::intern(port_id))
+        _block(block),
+        _port_id(pmt::intern(port_id))
     { block->message_port_register_out(_port_id); }
+
     ~MessageMetaWriter() {}
+
     void sendMetaData(std::map<std::string, std::string> metadata) {
-        if (serializer == nullptr) {
-           pmt::pmt_t metaDict = pmt::make_dict();
-           for (auto const& entry : metadata) {
-                metaDict = pmt::dict_add(metaDict, pmt::string_to_symbol(entry.first), pmt::string_to_symbol(entry.second));
-           }
-           _block->message_port_pub(_port_id, metaDict);
+        if (pmt::length(_block->message_subscribers(_port_id)) > 0) {
+            if (serializer == nullptr) {
+                pmt::pmt_t metaDict = pmt::make_dict();
+                for (auto const& entry : metadata) {
+                    metaDict = pmt::dict_add(metaDict, pmt::string_to_symbol(entry.first), pmt::string_to_symbol(entry.second));
+                }
+                _block->message_port_pub(_port_id, metaDict);
+            } else {
+                std::string metaString = serializer->serializeMetaData(metadata);
+                _block->message_port_pub(_port_id, pmt::string_to_symbol(metaString));
+            }
         } else {
-           std::string metaString = serializer->serializeMetaData(metadata);
-           _block->message_port_pub(_port_id, pmt::string_to_symbol(metaString));
+            std::string metaString = serializer->serializeMetaData(metadata);
+            std::cout << metaString << std::endl;
         }
     }
 };
