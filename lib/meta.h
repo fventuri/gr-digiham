@@ -42,8 +42,8 @@ public:
                 _block->message_port_pub(_port_id, pmt::string_to_symbol(metaString));
             }
         } else {
-            std::string metaString = serializer->serializeMetaData(metadata);
-            std::cout << metaString << std::endl;
+            // if there are no subscribers send metadata to stdout
+            std::cout << serializer->serializeMetaData(metadata);
         }
     }
 };
