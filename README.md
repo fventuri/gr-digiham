@@ -7,11 +7,11 @@ This module leverages the digiham library (https://github.com/jketterl/digiham) 
 
 ## Dependencies
 
-This module requires digiham (https://github.com/jketterl/digiham).
+This module depends on digiham (https://github.com/jketterl/digiham).
 
-digiham requres codecserver (https://github.com/jketterl/codecserver).
+digiham depends on csdr (https://github.com/jketterl/csdr), and codecserver (https://github.com/jketterl/codecserver).
 
-Please build and install codecserver and digiham before building this module.
+Please build and install csdr, codecserver, and digiham before building this module.
 
 
 ## Build and installation
@@ -32,7 +32,7 @@ Examples of GNU Radio Companion flowgraphs for decoding DMR, D-Star, and YSF are
 
 ## Credits
 
-- Many thanks to Jakob Ketterl, DD5JFK for all his hard work on developing and supporting Digiham and Codec Server; without them the gr-digiham OOT module wouldn't be possible
+- Many thanks to Jakob Ketterl, DD5JFK for all his hard work on developing and supporting Csdr, Digiham and Codec Server; without them the gr-digiham OOT module wouldn't be possible
 - Franco Spinelli, IW2DHW for his continuous support and testing of ths module
 
 
