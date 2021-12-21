@@ -6,7 +6,11 @@
  */
 
 #include "mbe_synthesizer_impl.h"
+#include <csdr/ringbuffer.hpp>
 #include <gnuradio/io_signature.h>
+
+//constexpr size_t T_BUFSIZE = (1024 * 1024 / 4);
+constexpr size_t T_BUFSIZE = 10240;
 
 namespace gr {
 namespace digiham {
@@ -32,13 +36,16 @@ mbe_synthesizer_impl::mbe_synthesizer_impl(DVMbeType type)
                 gr::io_signature::make(1, 1, sizeof(short)))
 {
     module = new Digiham::Mbe::MbeSynthesizer();
-    set_mode(type);
-    reader = new Reader<unsigned char>();
-    module->setReader(reader);
-    writer = new Writer<short>();
-    module->setWriter(writer);
+    inreader = new Reader<unsigned char>();
+    module->setReader(inreader);
+    auto buffer = new Csdr::Ringbuffer<short>(T_BUFSIZE);
+    outwriter = buffer;
+    module->setWriter(outwriter);
+    outreader = new Csdr::RingbufferReader<short>(buffer);
 
-    // output is always 8ks/s where each frame is always 20ms
+    set_mode(type);
+
+    // output is always 8ks/s where each frame is always 20ms (i.e. 50fps)
     // 8000 * 0.020 = 160
     set_output_multiple(160);
 }
@@ -49,11 +56,14 @@ mbe_synthesizer_impl::mbe_synthesizer_impl(unsigned int index, unsigned int bitr
                 gr::io_signature::make(1, 1, sizeof(short)))
 {
     module = new Digiham::Mbe::MbeSynthesizer();
+    inreader = new Reader<unsigned char>();
+    module->setReader(inreader);
+    auto buffer = new Csdr::Ringbuffer<short>(T_BUFSIZE);
+    outwriter = buffer;
+    module->setWriter(outwriter);
+    outreader = new Csdr::RingbufferReader<short>(buffer);
+
     set_mode(index, bitrate);
-    reader = new Reader<unsigned char>();
-    module->setReader(reader);
-    writer = new Writer<short>();
-    module->setWriter(writer);
 
     // output is always 8ks/s where each frame is always 20ms
     // 8000 * 0.020 = 160
@@ -66,11 +76,14 @@ mbe_synthesizer_impl::mbe_synthesizer_impl(short* cwds)
                 gr::io_signature::make(1, 1, sizeof(short)))
 {
     module = new Digiham::Mbe::MbeSynthesizer();
+    inreader = new Reader<unsigned char>();
+    module->setReader(inreader);
+    auto buffer = new Csdr::Ringbuffer<short>(T_BUFSIZE);
+    outwriter = buffer;
+    module->setWriter(outwriter);
+    outreader = new Csdr::RingbufferReader<short>(buffer);
+
     set_mode(cwds);
-    reader = new Reader<unsigned char>();
-    module->setReader(reader);
-    writer = new Writer<short>();
-    module->setWriter(writer);
 
     // output is always 8ks/s where each frame is always 20ms
     // 8000 * 0.020 = 160
@@ -81,10 +94,12 @@ mbe_synthesizer_impl::~mbe_synthesizer_impl()
 {
     delete module;
     module = nullptr;
-    delete reader;
-    reader = nullptr;
-    delete writer;
-    writer = nullptr;
+    delete inreader;
+    inreader = nullptr;
+    delete outreader;
+    outreader = nullptr;
+    delete outwriter;
+    outwriter = nullptr;
 }
 
 void mbe_synthesizer_impl::set_mode(DVMbeType type)
@@ -121,6 +136,7 @@ void mbe_synthesizer_impl::set_mode(DVMbeType type)
             // YSF - DN
             bitrate = 2450;
             bytes_per_frame = 7;
+            break;
     }
 }
 
@@ -156,12 +172,14 @@ int mbe_synthesizer_impl::general_work(int noutput_items,
     auto in = static_cast<const unsigned char*>(input_items[0]);
     auto out = static_cast<short*>(output_items[0]);
 
-    reader->set(ninput_items[0], in);
-    writer->set(noutput_items, out);
+    inreader->set(ninput_items[0], in);
     while (module->canProcess())
         module->process();
-    consume(0, ninput_items[0] - reader->available());
-    return noutput_items - writer->writeable();
+    consume(0, ninput_items[0] - inreader->available());
+    auto nproduced_items = std::min((size_t) noutput_items, outreader->available());
+    memcpy(out, outreader->getReadPointer(), nproduced_items * sizeof(short));
+    outreader->advance(nproduced_items);
+    return nproduced_items;
 }
 
 } /* namespace digiham */

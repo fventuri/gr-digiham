@@ -9,7 +9,8 @@
 #define INCLUDED_DIGIHAM_MBE_SYNTHESIZER_IMPL_H
 
 #include "reader.h"
-#include "writer.h"
+#include <csdr/reader.hpp>
+#include <csdr/writer.hpp>
 #include <digiham/mbe_synthesizer.hpp>
 #include <gnuradio/digiham/mbe_synthesizer.h>
 
@@ -20,8 +21,9 @@ class mbe_synthesizer_impl : public mbe_synthesizer
 {
 private:
     Digiham::Mbe::MbeSynthesizer* module;
-    Reader<unsigned char>* reader;
-    Writer<short>* writer;
+    Reader<unsigned char>* inreader;
+    Csdr::Writer<short>* outwriter;
+    Csdr::Reader<short>* outreader;
     unsigned int bitrate;
     unsigned int bytes_per_frame;  // ceil(bitrate / 50 / 8)
 

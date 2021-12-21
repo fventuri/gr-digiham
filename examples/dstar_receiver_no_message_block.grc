@@ -11,7 +11,7 @@ options:
     gen_linking: dynamic
     generate_options: no_gui
     hier_block_src_path: '.:'
-    id: dmr_receiver
+    id: dstar_receiver_no_message_block
     max_nouts: '0'
     output_language: python
     placement: (0,0)
@@ -22,7 +22,7 @@ options:
     run_options: prompt
     sizing_mode: fixed
     thread_safe_setters: ''
-    title: DMR Receiver
+    title: DStar Receiver without message block
     window_size: (1000,1000)
   states:
     bus_sink: false
@@ -49,7 +49,7 @@ blocks:
   id: variable
   parameters:
     comment: ''
-    value: '20'
+    value: '41'
   states:
     bus_sink: false
     bus_source: false
@@ -73,7 +73,7 @@ blocks:
   id: variable
   parameters:
     comment: ''
-    value: '100000'
+    value: '379000'
   states:
     bus_sink: false
     bus_source: false
@@ -97,7 +97,7 @@ blocks:
   id: variable
   parameters:
     comment: ''
-    value: '1000000'
+    value: '2000000'
   states:
     bus_sink: false
     bus_source: false
@@ -135,7 +135,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [496, 540.0]
+    coordinate: [632, 516.0]
     rotation: 0
     state: true
 - name: analog_quadrature_demod_cf_0
@@ -168,21 +168,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [672, 572.0]
-    rotation: 0
-    state: true
-- name: blocks_message_debug_0
-  id: blocks_message_debug
-  parameters:
-    affinity: ''
-    alias: ''
-    comment: ''
-    en_uvec: 'False'
-  states:
-    bus_sink: false
-    bus_source: false
-    bus_structure: null
-    coordinate: [312, 432.0]
+    coordinate: [816, 548.0]
     rotation: 0
     state: true
 - name: blocks_short_to_float_0
@@ -199,7 +185,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [288, 572.0]
+    coordinate: [416, 548.0]
     rotation: 0
     state: true
 - name: digiham_dc_block_0
@@ -214,7 +200,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [912, 356.0]
+    coordinate: [912, 364.0]
     rotation: 180
     state: true
 - name: digiham_digitalvoice_filter_0
@@ -229,31 +215,31 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [80, 580.0]
+    coordinate: [208, 556.0]
     rotation: 0
     state: true
-- name: digiham_dmr_decoder_0
-  id: digiham_dmr_decoder
+- name: digiham_dstar_decoder_0
+  id: digiham_dstar_decoder
   parameters:
     affinity: ''
     alias: ''
     comment: ''
     maxoutbuf: '0'
     minoutbuf: '0'
-    slot_filter: '3'
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [312, 344.0]
+    coordinate: [440, 352.0]
     rotation: 180
     state: true
-- name: digiham_gfsk_demodulator_0
-  id: digiham_gfsk_demodulator
+- name: digiham_fsk_demodulator_0
+  id: digiham_fsk_demodulator
   parameters:
     affinity: ''
     alias: ''
     comment: ''
+    invert: 'False'
     maxoutbuf: '0'
     minoutbuf: '0'
     samples_per_symbol: '10'
@@ -261,7 +247,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [512, 348.0]
+    coordinate: [656, 348.0]
     rotation: 180
     state: true
 - name: digiham_mbe_synthesizer_0
@@ -275,31 +261,12 @@ blocks:
     mbe_cwds: ''
     mbe_index: '0'
     minoutbuf: '0'
-    type: DMR
+    type: DStar
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [80, 332.0]
-    rotation: 180
-    state: true
-- name: digiham_rrc_filter_0
-  id: digiham_rrc_filter
-  parameters:
-    affinity: ''
-    alias: ''
-    coeffs: ''
-    comment: ''
-    gain: '0.0'
-    maxoutbuf: '0'
-    minoutbuf: '0'
-    n_zeros: '0'
-    type: Wide
-  states:
-    bus_sink: false
-    bus_source: false
-    bus_structure: null
-    coordinate: [728, 348.0]
+    coordinate: [192, 340.0]
     rotation: 180
     state: true
 - name: filter_fft_low_pass_filter_0
@@ -374,7 +341,7 @@ blocks:
     antenna: Antenna C
     bandwidth: 200e3
     biasT: 'False'
-    center_freq: '441900000'
+    center_freq: '146500000'
     comment: ''
     dab_notch_filter: 'False'
     dc_offset_mode: 'False'
@@ -404,13 +371,11 @@ connections:
 - [analog_agc2_xx_0, '0', audio_sink_0, '0']
 - [analog_quadrature_demod_cf_0, '0', digiham_dc_block_0, '0']
 - [blocks_short_to_float_0, '0', analog_agc2_xx_0, '0']
-- [digiham_dc_block_0, '0', digiham_rrc_filter_0, '0']
+- [digiham_dc_block_0, '0', digiham_fsk_demodulator_0, '0']
 - [digiham_digitalvoice_filter_0, '0', blocks_short_to_float_0, '0']
-- [digiham_dmr_decoder_0, '0', digiham_mbe_synthesizer_0, '0']
-- [digiham_dmr_decoder_0, metadata, blocks_message_debug_0, print]
-- [digiham_gfsk_demodulator_0, '0', digiham_dmr_decoder_0, '0']
+- [digiham_dstar_decoder_0, '0', digiham_mbe_synthesizer_0, '0']
+- [digiham_fsk_demodulator_0, '0', digiham_dstar_decoder_0, '0']
 - [digiham_mbe_synthesizer_0, '0', digiham_digitalvoice_filter_0, '0']
-- [digiham_rrc_filter_0, '0', digiham_gfsk_demodulator_0, '0']
 - [filter_fft_low_pass_filter_0, '0', analog_quadrature_demod_cf_0, '0']
 - [freq_xlating_fir_filter_xxx_0, '0', mmse_resampler_xx_0, '0']
 - [mmse_resampler_xx_0, '0', filter_fft_low_pass_filter_0, '0']

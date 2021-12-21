@@ -126,7 +126,7 @@ blocks:
     comment: ''
     decay_rate: 1e-4
     gain: '1.0'
-    max_gain: '30'
+    max_gain: '1'
     maxoutbuf: '0'
     minoutbuf: '0'
     reference: '1.0'
@@ -193,7 +193,7 @@ blocks:
     comment: ''
     maxoutbuf: '0'
     minoutbuf: '0'
-    scale: '1'
+    scale: '32768'
     vlen: '1'
   states:
     bus_sink: false
