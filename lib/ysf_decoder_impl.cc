@@ -61,8 +61,9 @@ int ysf_decoder_impl::general_work(int noutput_items,
 
     reader->set(ninput_items[0], in);
     writer->set(noutput_items, out);
-    while (module->canProcess())
+    while (module->canProcess() && writer->writeable() >= 40) {
         module->process();
+    }
     consume(0, ninput_items[0] - reader->available());
     return noutput_items - writer->writeable();
 }

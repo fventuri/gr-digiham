@@ -8,9 +8,14 @@
 #include "mbe_synthesizer_impl.h"
 #include <csdr/ringbuffer.hpp>
 #include <gnuradio/io_signature.h>
+#include <time.h>
 
-//constexpr size_t T_BUFSIZE = (1024 * 1024 / 4);
-constexpr size_t T_BUFSIZE = 10240;
+constexpr size_t T_BUFSIZE = 32768;
+//constexpr size_t T_BUFSIZE = 65536;
+// output is always 8ks/s where each frame is always 20ms (i.e. 50fps)
+// 8000 * 0.020 = 160
+constexpr int AUDIO_SAMPLES_PER_FRAME = 160;
+constexpr struct timespec MBE_WAIT_TIME_PER_FRAME = { 0, 2000000 };  // 2ms
 
 namespace gr {
 namespace digiham {
@@ -35,19 +40,8 @@ mbe_synthesizer_impl::mbe_synthesizer_impl(DVMbeType type)
                 gr::io_signature::make(1, 1, sizeof(unsigned char)),
                 gr::io_signature::make(1, 1, sizeof(short)))
 {
-    module = new Digiham::Mbe::MbeSynthesizer();
-    inreader = new Reader<unsigned char>();
-    module->setReader(inreader);
-    auto buffer = new Csdr::Ringbuffer<short>(T_BUFSIZE);
-    outwriter = buffer;
-    module->setWriter(outwriter);
-    outreader = new Csdr::RingbufferReader<short>(buffer);
-
+    init();
     set_mode(type);
-
-    // output is always 8ks/s where each frame is always 20ms (i.e. 50fps)
-    // 8000 * 0.020 = 160
-    set_output_multiple(160);
 }
 
 mbe_synthesizer_impl::mbe_synthesizer_impl(unsigned int index, unsigned int bitrate)
@@ -55,19 +49,8 @@ mbe_synthesizer_impl::mbe_synthesizer_impl(unsigned int index, unsigned int bitr
                 gr::io_signature::make(1, 1, sizeof(unsigned char)),
                 gr::io_signature::make(1, 1, sizeof(short)))
 {
-    module = new Digiham::Mbe::MbeSynthesizer();
-    inreader = new Reader<unsigned char>();
-    module->setReader(inreader);
-    auto buffer = new Csdr::Ringbuffer<short>(T_BUFSIZE);
-    outwriter = buffer;
-    module->setWriter(outwriter);
-    outreader = new Csdr::RingbufferReader<short>(buffer);
-
+    init();
     set_mode(index, bitrate);
-
-    // output is always 8ks/s where each frame is always 20ms
-    // 8000 * 0.020 = 160
-    set_output_multiple(160);
 }
 
 mbe_synthesizer_impl::mbe_synthesizer_impl(short* cwds)
@@ -75,19 +58,8 @@ mbe_synthesizer_impl::mbe_synthesizer_impl(short* cwds)
                 gr::io_signature::make(1, 1, sizeof(unsigned char)),
                 gr::io_signature::make(1, 1, sizeof(short)))
 {
-    module = new Digiham::Mbe::MbeSynthesizer();
-    inreader = new Reader<unsigned char>();
-    module->setReader(inreader);
-    auto buffer = new Csdr::Ringbuffer<short>(T_BUFSIZE);
-    outwriter = buffer;
-    module->setWriter(outwriter);
-    outreader = new Csdr::RingbufferReader<short>(buffer);
-
+    init();
     set_mode(cwds);
-
-    // output is always 8ks/s where each frame is always 20ms
-    // 8000 * 0.020 = 160
-    set_output_multiple(160);
 }
 
 mbe_synthesizer_impl::~mbe_synthesizer_impl()
@@ -135,7 +107,8 @@ void mbe_synthesizer_impl::set_mode(DVMbeType type)
             module->setMode(ysf_mode);
             // YSF - DN
             bitrate = 2450;
-            bytes_per_frame = 7;
+            // add 1 byte for the dynamic code
+            bytes_per_frame = 1 + 7;
             break;
     }
 }
@@ -159,9 +132,7 @@ void mbe_synthesizer_impl::set_mode(short* cwds)
 void mbe_synthesizer_impl::forecast(int noutput_items,
                                     gr_vector_int& ninput_items_required)
 {
-    // input: bytes_per_frame * 50
-    // output: 8000 samples/s = 160 * frames/s
-    ninput_items_required[0] = noutput_items / 160 * bytes_per_frame;
+    ninput_items_required[0] = noutput_items / AUDIO_SAMPLES_PER_FRAME * bytes_per_frame;
 }
 
 int mbe_synthesizer_impl::general_work(int noutput_items,
@@ -172,14 +143,39 @@ int mbe_synthesizer_impl::general_work(int noutput_items,
     auto in = static_cast<const unsigned char*>(input_items[0]);
     auto out = static_cast<short*>(output_items[0]);
 
-    inreader->set(ninput_items[0], in);
+    int frames_out = std::min(noutput_items, (int) outwriter->writeable()) / AUDIO_SAMPLES_PER_FRAME;
+    int frames = std::min((int) (ninput_items[0] / bytes_per_frame), frames_out);
+
+    int nin_items = frames * bytes_per_frame;
+    inreader->set(nin_items, in);
     while (module->canProcess())
         module->process();
-    consume(0, ninput_items[0] - inreader->available());
-    auto nproduced_items = std::min((size_t) noutput_items, outreader->available());
-    memcpy(out, outreader->getReadPointer(), nproduced_items * sizeof(short));
-    outreader->advance(nproduced_items);
-    return nproduced_items;
+    consume(0, nin_items - inreader->available());
+
+    // wait for MBE to produce items back
+    for (int i = 0; i < frames; i++) {
+        clock_nanosleep(CLOCK_REALTIME, 0, &MBE_WAIT_TIME_PER_FRAME, nullptr);
+    }
+
+    int nout_items = std::min(noutput_items, (int) outreader->available());
+    memcpy(out, outreader->getReadPointer(), nout_items * sizeof(short));
+    outreader->advance(nout_items);
+    return nout_items;
+}
+
+
+/* internal functions */
+void mbe_synthesizer_impl::init()
+{
+    module = new Digiham::Mbe::MbeSynthesizer();
+    inreader = new Reader<unsigned char>();
+    module->setReader(inreader);
+    auto buffer = new Csdr::Ringbuffer<short>(T_BUFSIZE);
+    outwriter = buffer;
+    module->setWriter(outwriter);
+    outreader = new Csdr::RingbufferReader<short>(buffer);
+
+    set_output_multiple(AUDIO_SAMPLES_PER_FRAME);
 }
 
 } /* namespace digiham */
