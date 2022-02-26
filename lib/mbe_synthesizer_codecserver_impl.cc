@@ -5,7 +5,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-#include "mbe_synthesizer_impl.h"
+#include "mbe_synthesizer_codecserver_impl.h"
 #include <csdr/ringbuffer.hpp>
 #include <gnuradio/io_signature.h>
 #include <time.h>
@@ -117,7 +117,7 @@ void mbe_synthesizer_impl::set_mode(unsigned int index, unsigned int bitrate)
 {
     module->setMode(new Digiham::Mbe::TableMode(index));
     this->bitrate = bitrate;
-    bytes_per_frame = ceil(bitrate / 50 / 8);
+    bytes_per_frame = ceil(static_cast<double>(bitrate) / 50 / 8);
 }
 
 void mbe_synthesizer_impl::set_mode(short* cwds)
@@ -126,7 +126,7 @@ void mbe_synthesizer_impl::set_mode(short* cwds)
     short frame_bits = cwds[5] & 0xff;
     // each frame is 20ms -> 50 frames/s
     bitrate = 50 * frame_bits;
-    bytes_per_frame = ceil(frame_bits / 8);
+    bytes_per_frame = ceil(static_cast<double>(frame_bits) / 8);
 }
 
 void mbe_synthesizer_impl::forecast(int noutput_items,

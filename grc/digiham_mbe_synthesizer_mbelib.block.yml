@@ -1,0 +1,111 @@
+id: digiham_mbe_synthesizer
+label: MBE Synthesizer
+category: '[digiham]'
+flags: '[ python, cpp ]'
+
+parameters:
+-   id: type
+    label: Dgital Voice MBE Type
+    dtype: enum
+    default: 'DMR'
+    options: ['DMR', 'DStar', 'YSF', 'MBE Index', 'MBE Control Words']
+    option_labels: ['DMR', 'DStar', 'YSF', 'MBE Index', 'MBE Control Words']
+-   id: mbe_index
+    label: MBE Index
+    dtype: int
+    default: 0
+    hide: ${'all' if type != 'MBE Index' else 'none'}
+-   id: mbe_bitrate
+    label: Bitrate
+    dtype: int
+    default: 0
+    hide: ${'all' if type != 'MBE Index' else 'none'}
+-   id: mbe_cwds
+    label: MBE Control Words
+    dtype: int_vector
+    hide: ${'all' if type != 'MBE Control Words' else 'none'}
+-   id: ysf_mode
+    label: YSF Mode
+    dtype: int
+    default: 2
+    hide: ${'all' if type != 'YSF' else 'none'}
+-   id: mbe_unvoiced_quality
+    label: MBE Unvoiced Quality
+    dtype: int
+    default: 3
+
+inputs:
+-   domain: stream
+    dtype: byte
+
+outputs:
+-   domain: stream
+    dtype: short
+
+templates:
+    imports: from gnuradio import digiham
+    make: |-
+        % if str(type) in ('DMR', 'DStar', 'YSF'):
+        digiham.mbe_synthesizer(digiham.mbe_synthesizer.${type}, ${mbe_unvoiced_quality})
+        % elif str(type) == 'MBE Index':
+        digiham.mbe_synthesizer(${mbe_index}, ${mbe_bitrate}, ${mbe_unvoiced_quality})
+        % elif str(type) == 'MBE Control Words':
+        digiham.mbe_synthesizer(${mbe_cwds}, ${mbe_unvoiced_quality})
+        % endif
+    callbacks:
+    -   |
+        % if str(type) in ('DMR', 'DStar', 'YSF'):
+        set_codec(digiham.mbe_synthesizer.${type})
+        % elif str(type) == 'MBE Index':
+        set_codec(${mbe_index}, ${mbe_bitrate})
+        % elif str(type) == 'MBE Control Words':
+        set_codec(${mbe_cwds})
+        % endif
+    - set_ysf_mode(${ysf_mode})
+    - set_unvoiced_quality(${mbe_unvoiced_quality})
+
+cpp_templates:
+    includes: [ '#include <gnuradio/digiham/mbe_synthesizer.h>' ]
+    declarations: 'digiham::mbe_synthesizer::sptr ${id};'
+    make: |-
+        % if str(type) in ('DMR', 'DStar', 'YSF'):
+        'this->${id} = digiham::mbe_synthesizer::make(mbe_synthesizer::DVMbeType::${type, ${mbe_unvoiced_quality}});'
+        % elif str(type) == 'MBE Index':
+        'this->${id} = digiham::mbe_synthesizer::make(${mbe_index}, ${mbe_bitrate, ${mbe_unvoiced_quality}});'
+        % elif str(type) == 'MBE Control Words':
+        'this->${id} = digiham::mbe_synthesizer::make(${mbe_cwds}, ${mbe_unvoiced_quality});'
+        % endif
+    callbacks:
+    -   |
+        % if str(type) in ('DMR', 'DStar', 'YSF'):
+        set_codec(mbe_synthesizer::DVMbeType::${type});
+        % elif str(type) == 'MBE Index':
+        set_codec(${mbe_index}, ${mbe_bitrate});
+        % elif str(type) == 'MBE Control Words':
+        set_codec(${mbe_cwds});
+        % endif
+    - set_ysf_mode(${ysf_mode});
+    - set_unvoiced_quality(${mbe_unvoiced_quality});
+    translations:
+        "'": '"'
+        'True': 'true'
+        'False': 'false'
+
+documentation: |-
+    Digiham MBE Synthesizer:
+
+    Digital Voice MBE Type:
+    One of: DMR, DStar, YSF, MBE Index, MBE Control Words
+
+    MBE Index:
+
+    Bitrate:
+
+    MBE Control Words:
+
+    YSF Mode:
+
+    MBE Unvoiced Quality:
+
+
+file_format: 1

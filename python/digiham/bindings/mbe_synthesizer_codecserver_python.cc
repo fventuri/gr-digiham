@@ -13,7 +13,7 @@
 /* If manual edits are made, the following tags should be modified accordingly.    */
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
-/* BINDTOOL_HEADER_FILE(mbe_synthesizer.h)                                        */
+/* BINDTOOL_HEADER_FILE(mbe_synthesizer_codecserver.h)                                        */
 /* BINDTOOL_HEADER_FILE_HASH(49af28db52790765c309cd3b8fac7019)                     */
 /***********************************************************************************/
 
@@ -23,9 +23,9 @@
 
 namespace py = pybind11;
 
-#include <gnuradio/digiham/mbe_synthesizer.h>
+#include <gnuradio/digiham/mbe_synthesizer_codecserver.h>
 // pydoc.h is automatically generated in the build directory
-#include <mbe_synthesizer_pydoc.h>
+#include <mbe_synthesizer_codecserver_pydoc.h>
 
 template <typename... Args>
 using overload_cast_ = py::detail::overload_cast_impl<Args...>;

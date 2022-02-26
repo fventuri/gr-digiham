@@ -22,8 +22,11 @@ list(APPEND digiham_sources
     nxdn_decoder_impl.cc
     pocsag_decoder_impl.cc
     ysf_decoder_impl.cc
-    mbe_synthesizer_impl.cc
 )
+message(STATUS "MBE_SYNTHESIZER=${MBE_SYNTHESIZER}")
+if(MBE_SYNTHESIZER STREQUAL codecserver OR MBE_SYNTHESIZER STREQUAL mbelib)
+    list(APPEND digiham_sources mbe_synthesizer_${MBE_SYNTHESIZER}_impl.cc)
+endif(MBE_SYNTHESIZER STREQUAL codecserver OR MBE_SYNTHESIZER STREQUAL mbelib)
 
 set(digiham_sources "${digiham_sources}" PARENT_SCOPE)
 if(NOT digiham_sources)
@@ -37,6 +40,9 @@ target_link_libraries(gnuradio-digiham
     Csdr::csdr++
     Digiham::digiham
   )
+if(MBE_SYNTHESIZER STREQUAL mbelib)
+    target_link_libraries(gnuradio-digiham ${LIBMBE_LIBRARY})
+endif(MBE_SYNTHESIZER STREQUAL mbelib)
 target_include_directories(gnuradio-digiham
     PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include>
     PUBLIC $<INSTALL_INTERFACE:include>

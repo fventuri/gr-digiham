@@ -12,7 +12,7 @@
 #include <csdr/reader.hpp>
 #include <csdr/writer.hpp>
 #include <digiham/mbe_synthesizer.hpp>
-#include <gnuradio/digiham/mbe_synthesizer.h>
+#include <gnuradio/digiham/mbe_synthesizer_codecserver.h>
 
 namespace gr {
 namespace digiham {

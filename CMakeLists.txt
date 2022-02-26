@@ -13,6 +13,13 @@ cmake_minimum_required(VERSION 3.8)
 project(gr-digiham CXX C)
 enable_testing()
 
+# MBE synthesizer type:
+# - none: no MBE synthesizer
+# - codecserver: uses OpenWebRX Codec Server to decode digital voice
+# - mbelib: uses MBELIB software AMBE decode library
+set(MBE_SYNTHESIZER none CACHE STRING "MBE synthesizer type [none|codecserver|mbelib]")
+string(TOLOWER ${MBE_SYNTHESIZER} MBE_SYNTHESIZER)
+
 # Install to PyBOMBS target prefix if defined
 if(DEFINED ENV{PYBOMBS_PREFIX})
     set(CMAKE_INSTALL_PREFIX $ENV{PYBOMBS_PREFIX})
@@ -125,6 +132,10 @@ find_package(CodecServer REQUIRED)
 find_package(Csdr REQUIRED)
 find_package(Digiham REQUIRED)
 find_package(ICU COMPONENTS uc REQUIRED)
+if(MBE_SYNTHESIZER STREQUAL mbelib)
+    set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake/")
+    find_package(LibMbe REQUIRED)
+endif(MBE_SYNTHESIZER STREQUAL mbelib)
 
 ########################################################################
 # Add subdirectories

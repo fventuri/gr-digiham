@@ -17,5 +17,13 @@ install(FILES
     digiham_nxdn_decoder.block.yml
     digiham_pocsag_decoder.block.yml
     digiham_ysf_decoder.block.yml
-    digiham_mbe_synthesizer.block.yml DESTINATION share/gnuradio/grc/blocks
+    DESTINATION share/gnuradio/grc/blocks
 )
+
+if(MBE_SYNTHESIZER STREQUAL codecserver OR MBE_SYNTHESIZER STREQUAL mbelib)
+    install(FILES
+        digiham_mbe_synthesizer_${MBE_SYNTHESIZER}.block.yml
+        DESTINATION share/gnuradio/grc/blocks
+        RENAME digiham_mbe_synthesizer.block.yml
+    )
+endif(MBE_SYNTHESIZER STREQUAL codecserver OR MBE_SYNTHESIZER STREQUAL mbelib)

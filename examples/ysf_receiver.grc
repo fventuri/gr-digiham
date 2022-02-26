@@ -19,7 +19,7 @@ options:
     realtime_scheduling: ''
     run: 'True'
     run_command: '{python} -u {filename}'
-    run_options: run
+    run_options: prompt
     sizing_mode: fixed
     thread_safe_setters: ''
     title: YSF Receiver
@@ -256,8 +256,10 @@ blocks:
     mbe_bitrate: '0'
     mbe_cwds: ''
     mbe_index: '0'
+    mbe_unvoiced_quality: '3'
     minoutbuf: '0'
     type: YSF
+    ysf_mode: '0'
   states:
     bus_sink: false
     bus_source: false
@@ -383,7 +385,7 @@ blocks:
     maxoutbuf: '0'
     minoutbuf: '0'
     output_type: fc32
-    rf_gRdB: '0'
+    rf_gR: '0'
     rf_notch_filter: 'False'
     rsp_selector: ''
     sample_rate: samp_rate
@@ -414,3 +416,4 @@ connections:
 
 metadata:
   file_format: 1
+  grc_version: v3.11.0.0git-34-g95ee7221

@@ -38,8 +38,11 @@ list(APPEND digiham_python_files
     dstar_decoder_python.cc
     nxdn_decoder_python.cc
     pocsag_decoder_python.cc
-    ysf_decoder_python.cc
-    mbe_synthesizer_python.cc python_bindings.cc)
+    ysf_decoder_python.cc)
+if(MBE_SYNTHESIZER STREQUAL codecserver OR MBE_SYNTHESIZER STREQUAL mbelib)
+    list(APPEND digiham_python_files mbe_synthesizer_${MBE_SYNTHESIZER}_python.cc)
+endif(MBE_SYNTHESIZER STREQUAL codecserver OR MBE_SYNTHESIZER STREQUAL mbelib)
+list(APPEND digiham_python_files python_bindings.cc)
 
 GR_PYBIND_MAKE_OOT(digiham
    ../../..

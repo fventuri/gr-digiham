@@ -21,5 +21,13 @@ install(FILES
     nxdn_decoder.h
     pocsag_decoder.h
     ysf_decoder.h
-    mbe_synthesizer.h DESTINATION include/gnuradio/digiham
+    DESTINATION include/gnuradio/digiham
 )
+
+if(MBE_SYNTHESIZER STREQUAL codecserver OR MBE_SYNTHESIZER STREQUAL mbelib)
+    install(FILES
+        mbe_synthesizer_${MBE_SYNTHESIZER}.h
+        DESTINATION include/gnuradio/digiham
+        RENAME mbe_synthesizer.h
+    )
+endif(MBE_SYNTHESIZER STREQUAL codecserver OR MBE_SYNTHESIZER STREQUAL mbelib)

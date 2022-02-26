@@ -260,13 +260,14 @@ blocks:
     mbe_bitrate: '0'
     mbe_cwds: ''
     mbe_index: '0'
+    mbe_unvoiced_quality: '3'
     minoutbuf: '0'
     type: DStar
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [192, 340.0]
+    coordinate: [192, 332.0]
     rotation: 180
     state: true
 - name: filter_fft_low_pass_filter_0
@@ -353,7 +354,7 @@ blocks:
     maxoutbuf: '0'
     minoutbuf: '0'
     output_type: fc32
-    rf_gRdB: '0'
+    rf_gR: '0'
     rf_notch_filter: 'False'
     rsp_selector: ''
     sample_rate: samp_rate
@@ -383,3 +384,4 @@ connections:
 
 metadata:
   file_format: 1
+  grc_version: v3.11.0.0git-34-g95ee7221
