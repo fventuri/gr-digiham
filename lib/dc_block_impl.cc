@@ -20,7 +20,7 @@ dc_block_impl::dc_block_impl()
                      gr::io_signature::make(1, 1, sizeof(float)),
                      gr::io_signature::make(1, 1, sizeof(float)))
 {
-    module = new Digiham::DcBlock::DcBlock();
+    module = new Csdr::DcBlock();
 }
 
 dc_block_impl::~dc_block_impl()

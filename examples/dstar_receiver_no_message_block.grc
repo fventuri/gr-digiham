@@ -117,6 +117,18 @@ blocks:
     coordinate: [560, 12.0]
     rotation: 0
     state: true
+- name: volume
+  id: variable
+  parameters:
+    comment: ''
+    value: '0.5'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [896, 12.0]
+    rotation: 0
+    state: true
 - name: analog_agc2_xx_0
   id: analog_agc2_xx
   parameters:
@@ -168,7 +180,25 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [816, 548.0]
+    coordinate: [1032, 548.0]
+    rotation: 0
+    state: true
+- name: blocks_multiply_const_vxx_0
+  id: blocks_multiply_const_vxx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    const: volume
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    type: float
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [808, 548.0]
     rotation: 0
     state: true
 - name: blocks_short_to_float_0
@@ -263,6 +293,7 @@ blocks:
     mbe_unvoiced_quality: '3'
     minoutbuf: '0'
     type: DStar
+    ysf_mode: '2'
   states:
     bus_sink: false
     bus_source: false
@@ -369,8 +400,9 @@ blocks:
     state: true
 
 connections:
-- [analog_agc2_xx_0, '0', audio_sink_0, '0']
+- [analog_agc2_xx_0, '0', blocks_multiply_const_vxx_0, '0']
 - [analog_quadrature_demod_cf_0, '0', digiham_dc_block_0, '0']
+- [blocks_multiply_const_vxx_0, '0', audio_sink_0, '0']
 - [blocks_short_to_float_0, '0', analog_agc2_xx_0, '0']
 - [digiham_dc_block_0, '0', digiham_fsk_demodulator_0, '0']
 - [digiham_digitalvoice_filter_0, '0', blocks_short_to_float_0, '0']
@@ -384,4 +416,4 @@ connections:
 
 metadata:
   file_format: 1
-  grc_version: v3.11.0.0git-34-g95ee7221
+  grc_version: v3.11.0.0git-38-g72311c07

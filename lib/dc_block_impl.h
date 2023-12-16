@@ -8,7 +8,7 @@
 #ifndef INCLUDED_DIGIHAM_DC_BLOCK_IMPL_H
 #define INCLUDED_DIGIHAM_DC_BLOCK_IMPL_H
 
-#include <digiham/dc_block.hpp>
+#include <csdr/dcblock.hpp>
 #include <gnuradio/digiham/dc_block.h>
 
 namespace gr {
@@ -17,7 +17,7 @@ namespace digiham {
 class dc_block_impl : public dc_block
 {
 private:
-    Digiham::DcBlock::DcBlock* module;
+    Csdr::DcBlock* module;
 
 public:
     dc_block_impl();

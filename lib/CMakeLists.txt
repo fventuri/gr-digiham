@@ -37,7 +37,7 @@ endif(NOT digiham_sources)
 add_library(gnuradio-digiham SHARED ${digiham_sources})
 target_link_libraries(gnuradio-digiham
     gnuradio::gnuradio-runtime
-    Csdr::csdr++
+    Csdr::csdr
     Digiham::digiham
   )
 if(MBE_SYNTHESIZER STREQUAL mbelib)
